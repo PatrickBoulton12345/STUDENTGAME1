@@ -1423,8 +1423,8 @@
                     <form id="lfgForm" novalidate>
                         <!-- Honeypot anti-spam field — hidden from real users -->
                         <div class="lfg-hp" aria-hidden="true">
-                            <label for="lfgWebsite">Website</label>
-                            <input type="text" id="lfgWebsite" name="website" tabindex="-1" autocomplete="off">
+                            <label for="lfgFax">Fax</label>
+                            <input type="text" id="lfgFax" name="fax_number" tabindex="-1" autocomplete="off">
                         </div>
                         <div class="lfg-field">
                             <label for="lfgName">name*</label>
@@ -1484,9 +1484,8 @@
 
             if (!form || !nameInput) return;
 
-            // Anti-spam: record when form was rendered
-            var formLoadedAt = Date.now();
-            var honeypotInput = document.getElementById('lfgWebsite');
+            // Anti-spam: honeypot field
+            var honeypotInput = document.getElementById('lfgFax');
 
             // Auto-fill name from game
             nameInput.value = playerName;
@@ -1583,9 +1582,8 @@
                 if (isSubmitting) return;
                 if (!validate()) return;
 
-                // Anti-spam: reject if honeypot filled or submitted too fast (<3s)
+                // Anti-spam: reject if honeypot filled (bot detection)
                 if (honeypotInput && honeypotInput.value) return;
-                if (Date.now() - formLoadedAt < 3000) return;
 
                 if (!PETITION_LIST_ID) {
                     submitErrorText.textContent = 'Petition configuration error. Please contact support.';
