@@ -864,6 +864,9 @@
         }
         .lfg-donate-wrap { display: flex; justify-content: center; }
 
+        /* Honeypot anti-spam — hidden from real users */
+        .lfg-hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; overflow: hidden; }
+
         @media (max-width: 600px) {
             .game-container {
                 margin: 10px;
@@ -1000,6 +1003,13 @@
         let interestAccrued = 0;
         let debtInterval = null;
 
+        // HTML-escape to prevent XSS via playerName
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // Regional youth unemployment data (ONS, Sep-Nov 2025)
         const unemploymentData = {
             "North East": { percent: 22.6, change: 0.7 },
@@ -1030,7 +1040,7 @@
                         <span class="region-rate" id="regionRate"></span>
                         <p class="region-rate-label">young people are unemployed in your region</p>
                         <span class="region-change" id="regionChange"></span>
-                        <p class="region-source">Source: <a href="https://www.ons.gov.uk/employmentandlabourmarket/peoplenotinwork/unemployment/datasets/regionalunemploymentbyagex02" target="_blank">ONS X02</a> · <a href="https://dashboards.lookingforgrowth.uk/youth-unemployment-dashboard.html" target="_blank">LFG Dashboard</a></p>
+                        <p class="region-source">Source: <a href="https://www.ons.gov.uk/employmentandlabourmarket/peoplenotinwork/unemployment/datasets/regionalunemploymentbyagex02" target="_blank" rel="noopener noreferrer">ONS X02</a> · <a href="https://dashboards.lookingforgrowth.uk/youth-unemployment-dashboard.html" target="_blank" rel="noopener noreferrer">LFG Dashboard</a></p>
                     </div>
                 </div>
             `;
@@ -1136,16 +1146,16 @@
                 case 1:
                     return `
                         <h2 class="step-title">A-Levels</h2>
-                        <p class="step-description" id="stepDescription">Well done <span class="player-name">${playerName}</span>, you've completed your A-Levels! Your teachers, your school, and the Government are all encouraging you to go to University.</p>
+                        <p class="step-description" id="stepDescription">Well done <span class="player-name">${escapeHtml(playerName)}</span>, you've completed your A-Levels! Your teachers, your school, and the Government are all encouraging you to go to University.</p>
                         <div id="resultArea"></div>
                         <div class="options-container" id="optionsContainer">
-                            <button class="option-btn" onclick="optionClick(this, () => goToStep(2))">Continue to University – The Government has promised a £100,000 '<a href="https://www.gov.uk/government/news/graduates-enjoy-100k-earnings-bonus-over-lifetime" target="_blank" class="source-link">graduate bonus</a>'!!</button>
+                            <button class="option-btn" onclick="optionClick(this, () => goToStep(2))">Continue to University – The Government has promised a £100,000 '<a href="https://www.gov.uk/government/news/graduates-enjoy-100k-earnings-bonus-over-lifetime" target="_blank" rel="noopener noreferrer" class="source-link">graduate bonus</a>'!!</button>
                         </div>
                     `;
                 case 2:
                     return `
                         <h2 class="step-title">University</h2>
-                        <p class="step-description" id="stepDescription"><span class="player-name">${playerName}</span>. You've decided to listen to the Government and your teachers and decided to go to University. How should you choose your course?</p>
+                        <p class="step-description" id="stepDescription"><span class="player-name">${escapeHtml(playerName)}</span>. You've decided to listen to the Government and your teachers and decided to go to University. How should you choose your course?</p>
                         <div id="resultArea"></div>
                         <div class="options-container" id="optionsContainer">
                             <button class="option-btn with-arrow" onclick="optionClick(this, showLeoPopup)">Research your course: Look at the records which links your course to your future earnings.<span class="bounce-arrow">→</span></button>
@@ -1154,7 +1164,7 @@
                 case 3:
                     return `
                         <h2 class="step-title">You have an essay due…</h2>
-                        <p class="step-description" id="stepDescription"><span class="player-name">${playerName}</span>, your first major assignment is approaching. How will you handle it?</p>
+                        <p class="step-description" id="stepDescription"><span class="player-name">${escapeHtml(playerName)}</span>, your first major assignment is approaching. How will you handle it?</p>
                         <div id="resultArea"></div>
                         <div class="options-container" id="optionsContainer">
                             <button class="option-btn" onclick="optionClick(this, () => selectEssayOption(0))">Use AI and turn it in at the last minute</button>
@@ -1164,7 +1174,7 @@
                 case 4:
                     return `
                         <h2 class="step-title">Group Project Time</h2>
-                        <p class="step-description" id="stepDescription"><span class="player-name">${playerName}</span>, you have a group project. You've had poor experiences in the past with your classmates refusing to contribute, or contributing with AI generated slop.</p>
+                        <p class="step-description" id="stepDescription"><span class="player-name">${escapeHtml(playerName)}</span>, you have a group project. You've had poor experiences in the past with your classmates refusing to contribute, or contributing with AI generated slop.</p>
                         <div id="resultArea"></div>
                         <div class="options-container" id="optionsContainer">
                             <button class="option-btn" onclick="optionClick(this, () => selectGroupOption(0))">Work with them. Maybe they are different this time.</button>
@@ -1174,7 +1184,7 @@
                 case 5:
                     return `
                         <h2 class="step-title">9AM Lecture</h2>
-                        <p class="step-description" id="stepDescription"><span class="player-name">${playerName}</span>, you have a 9AM lecture. You are hungover from the night before, and don't really have the energy to go.</p>
+                        <p class="step-description" id="stepDescription"><span class="player-name">${escapeHtml(playerName)}</span>, you have a 9AM lecture. You are hungover from the night before, and don't really have the energy to go.</p>
                         <div id="resultArea"></div>
                         <div class="options-container" id="optionsContainer">
                             <button class="option-btn" onclick="optionClick(this, () => selectLectureOption(0))">You force yourself to get up. You spend more than £10,000 a year. You might as well go.</button>
@@ -1184,7 +1194,7 @@
                 case 6:
                     return `
                         <h2 class="step-title">🎓 Graduation Day</h2>
-                        <p class="step-description" id="stepDescription">Congratulations <span class="player-name">${playerName}</span>! After three long years, you have finally graduated. It's time to make your next move in life.</p>
+                        <p class="step-description" id="stepDescription">Congratulations <span class="player-name">${escapeHtml(playerName)}</span>! After three long years, you have finally graduated. It's time to make your next move in life.</p>
                         <div id="resultArea"></div>
                         <div class="options-container" id="optionsContainer">
                             <button class="option-btn" onclick="optionClick(this, () => selectGradOption(0))">Apply for a master's degree</button>
@@ -1194,7 +1204,7 @@
                 case 8:
                     return `
                         <div class="emoji-large">🎉</div>
-                        <h2 class="step-title">You got an interview, ${playerName}!</h2>
+                        <h2 class="step-title">You got an interview, ${escapeHtml(playerName)}!</h2>
                         <p class="step-description" id="stepDescription">Unfortunately, it's eight rounds and you need to talk to an AI agent for 50% of them.</p>
                         <div class="options-container">
                             <button class="continue-btn" onclick="goToStep(9)">Begin the interview process <span class="bounce-arrow">→</span></button>
@@ -1203,7 +1213,7 @@
                 case 9:
                     return `
                         <h2 class="step-title red">Rejection</h2>
-                        <p class="step-description" id="stepDescription">Unfortunately, <span class="player-name">${playerName}</span>, at the eighth round you have been rejected. Your tie was the wrong colour and the HR representative didn't like it.</p>
+                        <p class="step-description" id="stepDescription">Unfortunately, <span class="player-name">${escapeHtml(playerName)}</span>, at the eighth round you have been rejected. Your tie was the wrong colour and the HR representative didn't like it.</p>
                         <div id="resultArea"></div>
                         <div class="options-container" id="optionsContainer">
                             <button class="option-btn" onclick="optionClick(this, handleApplyAgain)">Start applying again</button>
@@ -1257,7 +1267,7 @@
                 resultArea.innerHTML = `
                     <div class="result-box positive">
                         <p>A study conducted at the University of Reading showed that AI beats students in exams.</p>
-                        <p style="margin-top: 10px; font-size: 0.85rem;"><a href="https://www.bbc.co.uk/news/articles/cqqqln0eg65o" target="_blank" class="source-link">Source</a></p>
+                        <p style="margin-top: 10px; font-size: 0.85rem;"><a href="https://www.bbc.co.uk/news/articles/cqqqln0eg65o" target="_blank" rel="noopener noreferrer" class="source-link">Source</a></p>
                     </div>
                 `;
             } else {
@@ -1347,7 +1357,7 @@
 
             resultArea.innerHTML = `
                 <div class="result-box warning">
-                    <p><span class="player-name" style="color: white;">${playerName}</span>, you have graduated with £${getDisplayDebt().toLocaleString()} of debt.<br><br>It's time to get into the world of work.<br><br><strong>The odds are stacked against you.</strong><br><br>A report from the <a href="https://ise.org.uk/knowledge/insights/410/record_graduate_job_applications/" target="_blank" class="source-link">ISE</a> showed that 1.2 million people applied for just 17,000 graduate roles in 2024.</p>
+                    <p><span class="player-name" style="color: white;">${escapeHtml(playerName)}</span>, you have graduated with £${getDisplayDebt().toLocaleString()} of debt.<br><br>It's time to get into the world of work.<br><br><strong>The odds are stacked against you.</strong><br><br>A report from the <a href="https://ise.org.uk/knowledge/insights/410/record_graduate_job_applications/" target="_blank" rel="noopener noreferrer" class="source-link">ISE</a> showed that 1.2 million people applied for just 17,000 graduate roles in 2024.</p>
                 </div>
             `;
             optionsContainer.innerHTML = `<button class="continue-btn" onclick="goToStep(8)">Start applying <span class="bounce-arrow">→</span></button>`;
@@ -1371,7 +1381,7 @@
             content.innerHTML = `
                 <h2 class="step-title">Back to Square One</h2>
                 <div class="result-box negative">
-                    <p><span class="player-name" style="color: white;">${playerName}</span>. You tried again, and after 100 applications you had one interview consisting of ten rounds to be rejected.<br><br>You received no response for 30 and the rest were pre-generated apology emails with no feedback on your application.</p>
+                    <p><span class="player-name" style="color: white;">${escapeHtml(playerName)}</span>. You tried again, and after 100 applications you had one interview consisting of ten rounds to be rejected.<br><br>You received no response for 30 and the rest were pre-generated apology emails with no feedback on your application.</p>
                 </div>
                 <div class="options-container">
                     <button class="option-btn" onclick="optionClick(this, handleMoveCountry)">Move country</button>
@@ -1411,6 +1421,11 @@
                         <p id="lfgSubmitErrorText"></p>
                     </div>
                     <form id="lfgForm" novalidate>
+                        <!-- Honeypot anti-spam field — hidden from real users -->
+                        <div class="lfg-hp" aria-hidden="true">
+                            <label for="lfgWebsite">Website</label>
+                            <input type="text" id="lfgWebsite" name="website" tabindex="-1" autocomplete="off">
+                        </div>
                         <div class="lfg-field">
                             <label for="lfgName">name*</label>
                             <input type="text" id="lfgName" name="name" autocomplete="name">
@@ -1468,6 +1483,10 @@
             var fillEl = document.getElementById('lfgFill');
 
             if (!form || !nameInput) return;
+
+            // Anti-spam: record when form was rendered
+            var formLoadedAt = Date.now();
+            var honeypotInput = document.getElementById('lfgWebsite');
 
             // Auto-fill name from game
             nameInput.value = playerName;
@@ -1563,6 +1582,10 @@
                 e.preventDefault();
                 if (isSubmitting) return;
                 if (!validate()) return;
+
+                // Anti-spam: reject if honeypot filled or submitted too fast (<3s)
+                if (honeypotInput && honeypotInput.value) return;
+                if (Date.now() - formLoadedAt < 3000) return;
 
                 if (!PETITION_LIST_ID) {
                     submitErrorText.textContent = 'Petition configuration error. Please contact support.';
@@ -1686,11 +1709,11 @@
                 <div class="emoji-large">✈️🇳🇱</div>
                 <h2 class="step-title">A New Beginning</h2>
                 <div class="result-box positive">
-                    <p>${playerName}. You found a job in the Netherlands. You have a decent salary, and you are moving in a month. You will enjoy better healthcare, a higher quality of life and better infrastructure.</p>
+                    <p>${escapeHtml(playerName)}. You found a job in the Netherlands. You have a decent salary, and you are moving in a month. You will enjoy better healthcare, a higher quality of life and better infrastructure.</p>
                 </div>
                 <div class="final-message">
                     <h3>The U.K. has now lost another productive individual to another country.</h3>
-                    <p><span class="player-name">${playerName}</span>, they lied to you. They know the impact of each university and each degree, but they are covering it up. Help us STOP THE CONSPIRACY. FORCE the Government to RELEASE the records.</p>
+                    <p><span class="player-name">${escapeHtml(playerName)}</span>, they lied to you. They know the impact of each university and each degree, but they are covering it up. Help us STOP THE CONSPIRACY. FORCE the Government to RELEASE the records.</p>
                 </div>
                 ${getPetitionFormHTML()}
                 ${getUnemploymentBoxHTML()}
@@ -1710,11 +1733,11 @@
                 <div class="emoji-large">📉</div>
                 <h2 class="step-title">Universal Credit</h2>
                 <div class="result-box warning">
-                    <p>It won't be much, but it will be enough. <span class="player-name" style="color: white;">${playerName}</span>, you are now costing the taxpayer - but it is not your fault.</p>
+                    <p>It won't be much, but it will be enough. <span class="player-name" style="color: white;">${escapeHtml(playerName)}</span>, you are now costing the taxpayer - but it is not your fault.</p>
                 </div>
                 <div class="final-message">
                     <h3>The system failed you, it lied to you.</h3>
-                    <p><span class="player-name">${playerName}</span>, they lied to you. They know the impact of each university and each degree, but they are covering it up. Help us STOP THE CONSPIRACY. FORCE the Government to RELEASE the records.</p>
+                    <p><span class="player-name">${escapeHtml(playerName)}</span>, they lied to you. They know the impact of each university and each degree, but they are covering it up. Help us STOP THE CONSPIRACY. FORCE the Government to RELEASE the records.</p>
                 </div>
                 ${getPetitionFormHTML()}
                 ${getUnemploymentBoxHTML()}
